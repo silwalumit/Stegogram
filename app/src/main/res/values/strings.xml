@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Stegogram</string>
+
+    <string name="title_activity_home">Home</string>
+
+    <string name="action_settings">Settings</string>
+
+    <string name="chat_text">Chats</string>
+    <string name="contact_label">Contacts</string>
+    <string name="setting_label">Settings</string>
+    <string name="title_activity_main">MainActivity</string>
+
+
+</resources>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/contact_nav"
+        android:icon="@drawable/ic_contacts"
+        android:title="@string/contact_label" />
+
+    <item
+        android:id="@+id/chat_nav"
+        android:icon="@drawable/ic_chat"
+        android:title="@string/chat_text"
+      />
+
+    <item
+        android:id="@+id/settings_nav"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/setting_label" />
+
+</menu>
