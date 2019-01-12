@@ -11,10 +11,12 @@
 
     <FrameLayout
         android:id="@+id/fragment_container"
-        android:layout_width="409dp"
-        android:layout_height="524dp"
-        android:layout_marginTop="58dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="56dp"
         android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
     </FrameLayout>

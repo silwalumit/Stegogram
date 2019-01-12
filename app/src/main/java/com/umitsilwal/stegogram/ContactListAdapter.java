@@ -1,6 +1,7 @@
 package com.umitsilwal.stegogram;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
@@ -53,7 +54,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
     }
 
     public class ContactListHolder extends RecyclerView.ViewHolder implements  View.OnClickListener{
-
+        public final String EXTRA_TITLE = "com.umitsilwal.stegogram.TITLE";
         public final TextView mIcon;
         public final TextView mSender;
         public final TextView mContactTitle;
@@ -67,7 +68,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
             mSender = itemView.findViewById(R.id.textContactSender);
             mContactTitle = itemView.findViewById(R.id.textContactTitle);
             mContactDetail = itemView.findViewById(R.id.textContactDetails);
-            mContactTime = itemView.findViewById(R.id.textContactTitle);
+            mContactTime = itemView.findViewById(R.id.textContactTime);
             this.mAdapter = mAdapter;
 
             itemView.setOnClickListener(this);
@@ -81,7 +82,10 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
         @Override
         public void onClick(View v) {
             int pos = getLayoutPosition();
-
+            Intent intent = new Intent(context, MessageListActivity.class);
+            ContactsData contactInfo = contactData.get(pos);
+            intent.putExtra(EXTRA_TITLE, contactInfo.getmTitle());
+            context.startActivity(intent);
         }
     }
 }

@@ -24,6 +24,14 @@
             </intent-filter>
         </activity>
         <!-- <activity android:name=".HomeActivity"></activity> -->
+        <activity
+            android:name=".MessageListActivity"
+            android:parentActivityName="com.umitsilwal.stegogram.HomeActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.umitsilwal.stegogram.HomeActivity" />
+
+        </activity>
     </application>
 
 </manifest>
