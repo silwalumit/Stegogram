@@ -93,7 +93,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/social/ic_person_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/navigation/ic_arrow_back_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -103,12 +103,10 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="color" value="f9aa33" />
-                            <entry key="height" value="50" />
-                            <entry key="outputName" value="ic_person" />
+                            <entry key="color" value="3c9be6" />
+                            <entry key="outputName" value="ic_arrow_back_blue" />
                             <entry key="overrideSize" value="true" />
                             <entry key="sourceFile" value="C:\Users\Umit Silwal" />
-                            <entry key="width" value="50" />
                           </map>
                         </option>
                       </PersistentState>

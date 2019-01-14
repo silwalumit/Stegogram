@@ -21,7 +21,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
     private Context context;
     private LayoutInflater mInflater;
 
-    public ContactListAdapter(Context context, LinkedList<ContactsData> contactData){
+     ContactListAdapter(Context context, LinkedList<ContactsData> contactData){
         this.contactData = contactData;
         this.context = context;
         //this.mInflater = LayoutInflater.from(context);
@@ -74,11 +74,6 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
             itemView.setOnClickListener(this);
         }
 
-        /**
-         * Called when a view has been clicked.
-         *
-         * @param v The view that was clicked.
-         */
         @Override
         public void onClick(View v) {
             int pos = getLayoutPosition();
