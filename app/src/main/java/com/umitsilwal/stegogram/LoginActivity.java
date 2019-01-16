@@ -69,7 +69,9 @@ public class LoginActivity extends AppCompatActivity {
 
         // Check for a valid password, if the user entered one.
         if(TextUtils.isEmpty(password)){
-          mPasswordView.setError(getString(R.string.error_field_required));
+            mPasswordView.setError(getString(R.string.error_field_required));
+            focusView = mPasswordView;
+            cancel = true;
         } else if (!isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
@@ -115,9 +117,9 @@ public class LoginActivity extends AppCompatActivity {
             .apply();
 
         //Start the service
-        Intent i1 = new Intent(getApplicationContext(), NetworkConnectionService.class);
-        i1.setAction(MainActivity.LOGIN_ACTION);
-        startService(i1);
+        Intent intent = new Intent(getApplicationContext(), NetworkConnectionService.class);
+        intent.setAction(MainActivity.LOGIN_ACTION);
+        startService(intent);
     }
 
     @Override

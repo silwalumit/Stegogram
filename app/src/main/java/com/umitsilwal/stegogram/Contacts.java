@@ -23,39 +23,13 @@ public class Contacts extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ContactsData mContact = new ContactsData("Sam", "Weekend adventure",
-                "Let's go fishing with John and others. We will do some barbecue and have soo much fun",
-                "10:42am");
+        ContactsData mContact = new ContactsData("Sam", "sam@gmail.com");
         mContactList.add(mContact);
-        mContact = new ContactsData("Facebook", "James, you have 1 new notification",
-                "A lot has happened on Facebook since",
-                "16:04pm");
+        mContact = new ContactsData("John", "john@gmail.com");
         mContactList.add(mContact);
-        mContact = new ContactsData("Google+", "Top suggested Google+ pages for you",
-                "Top suggested Google+ pages for you",
-                "18:44pm");
+        mContact = new ContactsData("Adam", "adam23@gmail.com");
         mContactList.add(mContact);
-        mContact = new ContactsData("Twitter", "Follow T-Mobile, Samsung Mobile U",
-                "James, some people you may know",
-                "20:04pm");
-        mContactList.add(mContact);
-        mContact = new ContactsData("Pinterest Weekly", "Pins you’ll love!",
-                "Have you seen these Pins yet? Pinterest",
-                "09:04am");
-        mContactList.add(mContact);
-        mContact = new ContactsData("Josh", "Going lunch", "Don't forget our lunch at 3PM in Pizza hut",
-                "01:04am");
-        mContactList.add(mContact);
-        mContact = new ContactsData("Twitter", "Follow T-Mobile, Samsung Mobile U",
-                "James, some people you may know",
-                "20:04pm");
-        mContactList.add(mContact);
-        mContact = new ContactsData("Pinterest Weekly", "Pins you’ll love!",
-                "Have you seen these Pins yet? Pinterest",
-                "09:04am");
-        mContactList.add(mContact);
-        mContact = new ContactsData("Josh", "Going lunch", "Don't forget our lunch at 3PM in Pizza hut",
-                "01:04am");
+        mContact = new ContactsData("Josh", "josh_12@yahoo.com");
         mContactList.add(mContact);
     }
 

@@ -39,9 +39,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
     @Override
     public void onBindViewHolder(@NonNull ContactListHolder holder, int position) {
         holder.mSender.setText(contactData.get(position).getmSender());
-        holder.mContactTitle.setText(contactData.get(position).getmTitle());
-        holder.mContactDetail.setText(contactData.get(position).getmDetails());
-        holder.mContactTime.setText(contactData.get(position).getmTime());
+        holder.mSenderEmail.setText(contactData.get(position).getmEmail());
         holder.mIcon.setText(contactData.get(position).getmSender().substring(0, 1));
         Random mRandom = new Random();
         int color = Color.argb(255, mRandom.nextInt(256), mRandom.nextInt(256), mRandom.nextInt(256));
@@ -54,21 +52,17 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
     }
 
     public class ContactListHolder extends RecyclerView.ViewHolder implements  View.OnClickListener{
-        public final String EXTRA_TITLE = "com.umitsilwal.stegogram.TITLE";
+        public static final String EXTRA_TITLE = "com.umitsilwal.stegogram.TITLE";
         public final TextView mIcon;
         public final TextView mSender;
-        public final TextView mContactTitle;
-        public final TextView mContactDetail;
-        public final TextView mContactTime;
+        public final TextView mSenderEmail;
         final ContactListAdapter mAdapter;
 
         public ContactListHolder(View itemView, ContactListAdapter mAdapter) {
             super(itemView);
             mIcon = itemView.findViewById(R.id.textViewIcon);
             mSender = itemView.findViewById(R.id.textContactSender);
-            mContactTitle = itemView.findViewById(R.id.textContactTitle);
-            mContactDetail = itemView.findViewById(R.id.textContactDetails);
-            mContactTime = itemView.findViewById(R.id.textContactTime);
+            mSenderEmail = itemView.findViewById(R.id.textEmailSender);
             this.mAdapter = mAdapter;
 
             itemView.setOnClickListener(this);
@@ -79,7 +73,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
             int pos = getLayoutPosition();
             Intent intent = new Intent(context, MessageListActivity.class);
             ContactsData contactInfo = contactData.get(pos);
-            intent.putExtra(EXTRA_TITLE, contactInfo.getmTitle());
+            intent.putExtra(EXTRA_TITLE, contactInfo.getmSender());
             context.startActivity(intent);
         }
     }

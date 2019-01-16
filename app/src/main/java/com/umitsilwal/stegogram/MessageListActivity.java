@@ -13,13 +13,20 @@ import android.view.View;
 public class MessageListActivity extends AppCompatActivity {
     private RecyclerView messageeRecycler;
     private MessageListAdapter messageAdapter;
+    private Toolbar toolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message_list);
 
-        final Toolbar toolbar = findViewById(R.id.toolbar);
+        Intent starter = getIntent();
+        String title = starter.getStringExtra(ContactListAdapter.ContactListHolder.EXTRA_TITLE);
+
+        toolbar = findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_blue);
+        toolbar.setTitle(title);
+
         setSupportActionBar(toolbar);
         try {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -31,6 +38,7 @@ public class MessageListActivity extends AppCompatActivity {
         messageeRecycler.setLayoutManager(new LinearLayoutManager(this));
         //messageAdapter = new MessageListAdapter(this, messageList);
     }
+
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();

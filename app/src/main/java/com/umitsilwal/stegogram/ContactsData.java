@@ -3,30 +3,19 @@ package com.umitsilwal.stegogram;
 public class ContactsData {
 
     private String mSender;
-    private String mTitle;
-    private String mDetails;
-    private String mTime;
+    private String mEmail;
 
-    public ContactsData(String mSender, String mTitle, String mDetails, String mTime) {
+    public ContactsData(String mSender, String mEmail) {
         this.mSender = mSender;
-        this.mTitle = mTitle;
-        this.mDetails = mDetails;
-        this.mTime = mTime;
+        this.mEmail = mEmail;
     }
 
     public String getmSender() {
         return mSender;
     }
 
-    public String getmTitle() {
-        return mTitle;
+    public String getmEmail() {
+        return mEmail;
     }
 
-    public String getmDetails() {
-        return mDetails;
-    }
-
-    public String getmTime() {
-        return mTime;
-    }
 }

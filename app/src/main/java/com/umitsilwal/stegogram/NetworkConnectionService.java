@@ -91,6 +91,10 @@ public class NetworkConnectionService extends Service {
                 });
                 mThread.start();
             }
+        }else{
+            Intent i1 = new Intent(CONNECTED);
+            i1.setPackage(getPackageName());
+            this.sendBroadcast(i1);
         }
     }
 
@@ -124,10 +128,10 @@ public class NetworkConnectionService extends Service {
         mTHandler.post(new Runnable() {
             @Override
             public void run() {
-                if( mConnection != null)
-                {
-                    mConnection.disconnect();
-                }
+            if( mConnection != null)
+            {
+                mConnection.disconnect();
+            }
             }
         });
         mThread = null;

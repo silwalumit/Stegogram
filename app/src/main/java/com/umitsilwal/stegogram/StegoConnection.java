@@ -53,11 +53,10 @@ public class StegoConnection implements ConnectionListener {
         Log.d(TAG, "Connecting");
         XMPPTCPConnectionConfiguration builder = XMPPTCPConnectionConfiguration.builder()
                 .setUsernameAndPassword(mUsername, mPassword)
-                .setHostAddress(InetAddress.getByName("192.168.100.16"))
+                .setHostAddress(InetAddress.getByName("10.0.2.2"))
                 .setSecurityMode(ConnectionConfiguration.SecurityMode.disabled)
                 .setPort(5222)
                 .setXmppDomain("chat")
-                .setDebuggerEnabled(true)
                 .setSendPresence(false)
                 .setResource("Resource")
                 .build();
@@ -96,19 +95,6 @@ public class StegoConnection implements ConnectionListener {
             i.setPackage(mAppContext.getPackageName());
             mAppContext.sendBroadcast(i);
         }
-    }
-
-    @Override
-    public void reconnectingIn(int milisec) {
-        NetworkConnectionService.sConnectionState = CONNECTIONSTATE.CONNECTING;
-    }
-    @Override
-    public void reconnectionSuccessful() {
-        NetworkConnectionService.sConnectionState = CONNECTIONSTATE.CONNECTED;
-    }
-    @Override
-    public void reconnectionFailed(Exception e) {
-        NetworkConnectionService.sConnectionState = CONNECTIONSTATE.DISCONNECTED;
     }
 
     /**
