@@ -1,4 +1,4 @@
-package com.umitsilwal.stegogram;
+package com.umitsilwal.stegogram.Fragments;
 
 
 import android.os.Bundle;
@@ -7,15 +7,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.umitsilwal.stegogram.R;
+
 import org.jetbrains.annotations.NotNull;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class Settings extends Fragment {
+public class SettingsFragment extends Fragment {
 
-    public Settings() {
+    public SettingsFragment() {
         // Required empty public constructor
     }
 

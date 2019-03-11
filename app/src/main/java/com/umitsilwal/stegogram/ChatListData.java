@@ -1,6 +1,6 @@
 package com.umitsilwal.stegogram;
 
-class ChatListData {
+public class ChatListData {
 
     private String mSender;
     private String mDetails;

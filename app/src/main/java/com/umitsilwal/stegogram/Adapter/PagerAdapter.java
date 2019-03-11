@@ -1,8 +1,12 @@
-package com.umitsilwal.stegogram;
+package com.umitsilwal.stegogram.Adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+
+import com.umitsilwal.stegogram.Fragments.ChatFragment;
+import com.umitsilwal.stegogram.Fragments.Contacts;
+import com.umitsilwal.stegogram.Fragments.SettingsFragment;
 
 public class PagerAdapter extends FragmentStatePagerAdapter {
     private int numOfTabs = 3;
@@ -20,8 +24,8 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         switch (position){
             case 0: return new Contacts();
-            case 1: return new ChatList();
-            case 2: return new Settings();
+            case 1: return new ChatFragment();
+            case 2: return new SettingsFragment();
             default: return null;
         }
     }

@@ -1,8 +1,9 @@
-package com.umitsilwal.stegogram;
+package com.umitsilwal.stegogram.Fragments;
 
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,14 +12,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.umitsilwal.stegogram.Adapter.ChatListAdapter;
+import com.umitsilwal.stegogram.ChatListData;
+import com.umitsilwal.stegogram.R;
+
 import java.util.LinkedList;
 
 
-public class ChatList extends Fragment {
+public class ChatFragment extends Fragment {
 
     private LinkedList<ChatListData> mChatListData = new LinkedList<>();
 
-    public ChatList() {
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
         ChatListData mContact = new ChatListData("Sam",
                 "Let's go fishing with John and others. We will do some barbecue and have soo much fun",
                 "10:42am");

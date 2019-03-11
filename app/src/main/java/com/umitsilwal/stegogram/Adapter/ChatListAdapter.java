@@ -1,7 +1,6 @@
-package com.umitsilwal.stegogram;
+package com.umitsilwal.stegogram.Adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
@@ -9,8 +8,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 import android.widget.TextView;
+
+import com.umitsilwal.stegogram.ChatListData;
+import com.umitsilwal.stegogram.R;
 
 import java.util.LinkedList;
 import java.util.Random;
@@ -69,10 +70,10 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatLi
         @Override
         public void onClick(View v) {
             int pos = getLayoutPosition();
-            Intent intent = new Intent(context, MessageListActivity.class);
-            ChatListData chatInfo = chatListData.get(pos);
-            intent.putExtra(ContactListAdapter.ContactListHolder.EXTRA_TITLE, chatInfo.getmSender());
-            context.startActivity(intent);
+//            Intent intent = new Intent(context, MessageListActivity.class);
+//            ChatListData chatInfo = chatListData.get(pos);
+//            intent.putExtra(ContactListAdapter.ContactListHolder.EXTRA_TITLE, chatInfo.getmSender());
+//            context.startActivity(intent);
         }
     }
 }

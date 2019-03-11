@@ -1,4 +1,4 @@
-package com.umitsilwal.stegogram;
+package com.umitsilwal.stegogram.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,39 +11,42 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.umitsilwal.stegogram.Activity.MessageListActivity;
+import com.umitsilwal.stegogram.BuildConfig;
+import com.umitsilwal.stegogram.ContactData;
+import com.umitsilwal.stegogram.R;
+
 import java.util.LinkedList;
 import java.util.Random;
 
 
 public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.ContactListHolder> {
 
-    private LinkedList<ContactsData> contactData;
+    private LinkedList<ContactData> contactData;
     private Context context;
-    private LayoutInflater mInflater;
 
-     ContactListAdapter(Context context, LinkedList<ContactsData> contactData){
+    public ContactListAdapter(Context context, LinkedList<ContactData> contactData){
         this.contactData = contactData;
         this.context = context;
-        //this.mInflater = LayoutInflater.from(context);
     }
 
     @NonNull
     @Override
     public ContactListHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(this.context).inflate(R.layout.contact_list,parent,false);
-       // View view = mInflater.inflate(R.layout.contact_list, parent, false);
         return new ContactListHolder(view, this);
     }
 
 
     @Override
     public void onBindViewHolder(@NonNull ContactListHolder holder, int position) {
-        holder.mSender.setText(contactData.get(position).getmSender());
-        holder.mSenderEmail.setText(contactData.get(position).getmEmail());
-        holder.mIcon.setText(contactData.get(position).getmSender().substring(0, 1));
-        Random mRandom = new Random();
+        ContactData contact = contactData.get(position);
+        holder.mSender.setText(contact.getName());
+        holder.mSenderEmail.setText(contact.getJid());
+        holder.mIcon.setText(contact.getName().substring(0, 1).toUpperCase());
+        /*Random mRandom = new Random();
         int color = Color.argb(255, mRandom.nextInt(256), mRandom.nextInt(256), mRandom.nextInt(256));
-        ((GradientDrawable) holder.mIcon.getBackground()).setColor(color);
+        ((GradientDrawable) holder.mIcon.getBackground()).setColor(color);*/
     }
 
     @Override
@@ -52,7 +55,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
     }
 
     public class ContactListHolder extends RecyclerView.ViewHolder implements  View.OnClickListener{
-        public static final String EXTRA_TITLE = "com.umitsilwal.stegogram.TITLE";
+        public static final String RECEIVER = BuildConfig.APPLICATION_ID + ".MESSAGE_RECEIVER";
         public final TextView mIcon;
         public final TextView mSender;
         public final TextView mSenderEmail;
@@ -72,8 +75,8 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
         public void onClick(View v) {
             int pos = getLayoutPosition();
             Intent intent = new Intent(context, MessageListActivity.class);
-            ContactsData contactInfo = contactData.get(pos);
-            intent.putExtra(EXTRA_TITLE, contactInfo.getmSender());
+            ContactData contactInfo = contactData.get(pos);
+            intent.putExtra(RECEIVER, contactInfo);
             context.startActivity(intent);
         }
     }

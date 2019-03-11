@@ -1,4 +1,4 @@
-package com.umitsilwal.stegogram;
+package com.umitsilwal.stegogram.Activity;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -19,14 +20,20 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.umitsilwal.stegogram.NetworkBroadcastReceiver;
+import com.umitsilwal.stegogram.R;
+import com.umitsilwal.stegogram.StegoConnectionService;
+
 
 /**
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends AppCompatActivity {
 
+    //Debug Tag
+    private static final String TAG = "LoginActivity";
     private BroadcastReceiver mBroadcastReceiver;
-
+    private Context mContext;
     // UI references.
     private EditText mPasswordView,mEmailView;
 
@@ -34,9 +41,9 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
         // Set up the login form.
         mEmailView = findViewById(R.id.email);
-
         mPasswordView = findViewById(R.id.password);
 
         Button mEmailSignInButton = findViewById(R.id.email_sign_in_button);
@@ -46,7 +53,47 @@ public class LoginActivity extends AppCompatActivity {
                 attemptLogin();
             }
         });
+        mContext = this;
+    }
 
+    @Override
+    protected void onPause() {
+        Log.d(StegoConnectionService.TAG, "LoginActivity Paused.");
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
+    }
+
+    @Override
+    protected void onResume() {
+        Log.d(StegoConnectionService.TAG, "LoginActivity Resumed.");
+        super.onResume();
+
+        mBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                switch (action){
+                    case StegoConnectionService.ACTION_CONNECTED:
+                        Intent login = new Intent(getApplicationContext(), StegoConnectionService.class);
+                        login.setAction(StegoConnectionService.ACTION_LOGIN);
+                        startService(login);
+                        break;
+                    case StegoConnectionService.ACTION_AUTHENTICATED:
+                        startActivity(new Intent(getApplicationContext(), HomeActivity.class));
+                        finish();
+                        break;
+                    case StegoConnectionService.ACTION_AUTH_FAILED:
+                        mPasswordView.setError(getString(R.string.error_incorrect_password));
+                        mPasswordView.requestFocus();
+                        break;
+                }
+            }
+        };
+
+        IntentFilter intentFilter = new IntentFilter(StegoConnectionService.ACTION_AUTHENTICATED);
+        intentFilter.addAction(StegoConnectionService.ACTION_AUTH_FAILED);
+        intentFilter.addAction(StegoConnectionService.ACTION_CONNECTED);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, intentFilter);
     }
 
     /**
@@ -68,11 +115,7 @@ public class LoginActivity extends AppCompatActivity {
         View focusView = null;
 
         // Check for a valid password, if the user entered one.
-        if(TextUtils.isEmpty(password)){
-            mPasswordView.setError(getString(R.string.error_field_required));
-            focusView = mPasswordView;
-            cancel = true;
-        } else if (!isPasswordValid(password)) {
+        if(TextUtils.isEmpty(password) || !isPasswordValid(password)){
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
@@ -94,73 +137,31 @@ public class LoginActivity extends AppCompatActivity {
             // form field with an error.
             focusView.requestFocus();
         } else {
-            saveCredentialsAndLogin(email, password);
+            saveCredentialsAndLogin();
         }
     }
 
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return true;
-        // return email.contains("@");
+        return email.contains("@");
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
         return password.length() > 3;
     }
 
-    private void saveCredentialsAndLogin(String email, String password){
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+    private void saveCredentialsAndLogin(){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.edit()
-            .putString("xmpp_username", email)
-            .putString("xmpp_password", password)
-            .apply();
-
+                .putString("xmpp_username", mEmailView.getText().toString())
+                .putString("xmpp_password", mPasswordView.getText().toString())
+                .putBoolean("xmpp_logged_in", true)
+                .apply();
         //Start the service
-        Intent intent = new Intent(getApplicationContext(), NetworkConnectionService.class);
-        intent.setAction(MainActivity.LOGIN_ACTION);
+        Intent intent = new Intent(getApplicationContext(), StegoConnectionService.class);
+        intent.setAction(StegoConnectionService.ACTION_LOGIN);
         startService(intent);
     }
 
-    @Override
-    protected void onPause() {
-        Log.d(NetworkConnectionService.TAG, "LoginActivity Paused.");
-        super.onPause();
-        this.unregisterReceiver(mBroadcastReceiver);
-    }
-
-    @Override
-    protected void onResume() {
-        Log.d(NetworkConnectionService.TAG, "LoginActivity Resumed.");
-        super.onResume();
-
-        mBroadcastReceiver = new NetworkBroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                super.onReceive(context, intent);
-                String action = intent.getAction();
-                switch (action){
-                    case NetworkConnectionService.NO_CONNECTION:
-                        startService(new Intent(getApplicationContext(), NetworkConnectionService.class));
-                        break;
-                    case NetworkConnectionService.AUTHENTICATED:
-                        startActivity(new Intent(getApplicationContext(), HomeActivity.class));
-                        finish();
-                        break;
-                    case NetworkConnectionService.AUTHENTICATION_FAILED:
-                        mPasswordView.setError(getString(R.string.error_incorrect_password));
-                        mPasswordView.requestFocus();
-                        break;
-                }
-            }
-        };
-
-        IntentFilter intentFilter = new IntentFilter(NetworkConnectionService.AUTHENTICATED);
-        intentFilter.addAction(NetworkConnectionService.AUTHENTICATION_FAILED);
-        intentFilter.addAction(NetworkConnectionService.NO_CONNECTION);
-        intentFilter.addAction(NetworkConnectionService.CONNECTED);
-        this.registerReceiver(mBroadcastReceiver, intentFilter);
-    }
 
 }
 

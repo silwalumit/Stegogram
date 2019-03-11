@@ -1,11 +1,10 @@
-package com.umitsilwal.stegogram;
+package com.umitsilwal.stegogram.Activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -17,10 +16,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.umitsilwal.stegogram.Fragments.ChatFragment;
+import com.umitsilwal.stegogram.ContactData;
+import com.umitsilwal.stegogram.Fragments.Contacts;
+import com.umitsilwal.stegogram.R;
+import com.umitsilwal.stegogram.Fragments.SettingsFragment;
+import com.umitsilwal.stegogram.StegoConnectionService;
+
+import java.util.LinkedList;
+
 
 public class HomeActivity extends AppCompatActivity {
     private MenuItem contactItem;
-    public static final String LOGOUT_ACTION = "com.umitsilwal.stegogram.LOGOUT";
+
+    private LinkedList<ContactData> mContactList = new LinkedList<ContactData>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,17 +59,19 @@ public class HomeActivity extends AppCompatActivity {
                 {
                     case R.id.contact_nav:
                         toolbar.setTitle("Contacts");
+                        //Contacts contacts = new Contacts();
+                        //contacts.setContactData(mContactList);
                         replaceFragment(new Contacts());
                         return true;
 
                     case R.id.chat_nav:
                         toolbar.setTitle("Chats");
-                        replaceFragment(new ChatList());
+                        replaceFragment(new ChatFragment());
                         return true;
 
                     case R.id.settings_nav:
-                        toolbar.setTitle("Settings");
-                        replaceFragment(new Settings());
+                        toolbar.setTitle("SettingsFragment");
+                        replaceFragment(new SettingsFragment());
                         return true;
                 }
                 return false;
@@ -73,7 +84,7 @@ public class HomeActivity extends AppCompatActivity {
         return true;
     }
 
-    //clink to the next fragment.
+    //change the fragment.
     public void replaceFragment(Fragment fragment){
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -81,14 +92,17 @@ public class HomeActivity extends AppCompatActivity {
         transaction.commit();
     }
 
-
     public void logout(View view){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        prefs.edit().putString("xmpp_username", null).putString("xmpp_password", null).apply();
+        prefs.edit()
+                .putString("xmpp_username", null)
+                .putString("xmpp_password", null)
+                .putBoolean("xmpp_logged_in", false)
+                .apply();
 
-        Log.d(NetworkConnectionService.TAG, "Logging out.");
-        Intent logout = new Intent(this, NetworkConnectionService.class);
-        logout.setAction(LOGOUT_ACTION);
+        Log.d(StegoConnectionService.TAG, "Logging out.");
+        Intent logout = new Intent(this, StegoConnectionService.class);
+        logout.setAction(StegoConnectionService.ACTION_LOGOUT);
         startService(logout);
 
         startActivity(new Intent(this, LoginActivity.class));
