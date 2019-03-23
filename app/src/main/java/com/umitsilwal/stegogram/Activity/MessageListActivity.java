@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
@@ -28,15 +27,15 @@ import android.widget.Toast;
 import com.umitsilwal.stegogram.ContactData;
 import com.umitsilwal.stegogram.Adapter.ContactListAdapter;
 import com.umitsilwal.stegogram.Adapter.MessageListAdapter;
+import com.umitsilwal.stegogram.Database.DBHelper;
 import com.umitsilwal.stegogram.NetworkBroadcastReceiver;
 import com.umitsilwal.stegogram.R;
-import com.umitsilwal.stegogram.StegoConnection;
 import com.umitsilwal.stegogram.StegoConnectionService;
 import com.umitsilwal.stegogram.StegoMessage;
+import com.umitsilwal.stegogram.Utils.HelperMethods;
 
 import org.jivesoftware.smack.packet.Message;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 
@@ -53,6 +52,8 @@ public class MessageListActivity extends AppCompatActivity implements View.OnCli
     private ImageView imagePreview;
     private FloatingActionButton cancel_btn;
 
+    private DBHelper mMessagesDB;
+    private RecyclerView messageRecycler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +66,8 @@ public class MessageListActivity extends AppCompatActivity implements View.OnCli
 
         Intent starter = getIntent();
         receiver = (ContactData) starter.getSerializableExtra(ContactListAdapter.ContactListHolder.RECEIVER);
+
+        mMessagesDB = new DBHelper(getApplicationContext());
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_blue);
@@ -83,7 +86,7 @@ public class MessageListActivity extends AppCompatActivity implements View.OnCli
         imagePreview.setVisibility(View.GONE);
         cancel_btn.hide();
 
-        final RecyclerView messageRecycler = findViewById(R.id.reyclerview_message_list);
+        messageRecycler = findViewById(R.id.reyclerview_message_list);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         layoutManager.setStackFromEnd(true);
         messageRecycler.setLayoutManager(layoutManager);
@@ -111,6 +114,17 @@ public class MessageListActivity extends AppCompatActivity implements View.OnCli
         selectImageBtn.setOnClickListener(this);
         cancel_btn.setOnClickListener(this);
         messageContainer = findViewById(R.id.edittext_chatbox);
+
+        Cursor messages = mMessagesDB.GetMessageList(currentUser, receiver.getJid().asUnescapedString());
+        while (messages.moveToNext()){
+            String sender = messages.getString(messages.getColumnIndex(DBHelper.MessagesTableInfo.COL_SENDER));
+            String receiver = messages.getString(messages.getColumnIndex(DBHelper.MessagesTableInfo.COL_RECEIVER));
+            String message = messages.getString(messages.getColumnIndex(DBHelper.MessagesTableInfo.COL_MESSAGE));
+            String image = messages.getString(messages.getColumnIndex(DBHelper.MessagesTableInfo.COL_IMAGE));
+            String date = messages.getString(messages.getColumnIndex(DBHelper.MessagesTableInfo.COL_DATE));
+            StegoMessage msg = new StegoMessage(sender, message, image, date);
+            addMessage(msg);
+        }
     }
 
     @Override
@@ -194,7 +208,7 @@ public class MessageListActivity extends AppCompatActivity implements View.OnCli
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d("com.umit.debug", "File");
+        //Log.d("com.umit.debug", "File");
         try{
             if(resultCode == RESULT_OK){
                 if(requestCode == REQUEST_GET_SINGLE_FILE){
@@ -205,7 +219,7 @@ public class MessageListActivity extends AppCompatActivity implements View.OnCli
                 }
             }
         }catch(Exception e){
-            Log.e("FileSelectorActivity", "File select error", e);
+            //Log.e("FileSelectorActivity", "File select error", e);
         }
 
     }
@@ -213,13 +227,15 @@ public class MessageListActivity extends AppCompatActivity implements View.OnCli
     public void addMessage(StegoMessage message) {
         messageList.add(message);
         messageAdapter.notifyItemInserted(messageList.size());
+        messageRecycler.smoothScrollToPosition(messageAdapter.getItemCount() - 1);
     }
+
 
     private void sendMessage() {
         messageContainer.setEnabled(false);
         String message = messageContainer.getText().toString().trim();
         if(message.length() > 0 && imagePath == null){
-            Log.d("com.umit.debug", "Sending message: "+message);
+            //Log.d("com.umit.debug", "Sending message: "+message);
             Intent sendMessage = new Intent(getApplicationContext(), StegoConnectionService.class);
             sendMessage.setAction(StegoConnectionService.ACTION_SEND_MESSAGE);
             sendMessage.putExtra("message_body", message);
@@ -228,7 +244,7 @@ public class MessageListActivity extends AppCompatActivity implements View.OnCli
 
             Message temp = new Message();
             temp.setBody(message);
-            addMessage(new StegoMessage(temp, currentUser));
+            addMessage(new StegoMessage(temp, currentUser, HelperMethods.NowString()));
             messageContainer.setText("");
         }else if(imagePath != null){
             Intent sendImage = new Intent(this, StegoConnectionService.class);
@@ -241,10 +257,11 @@ public class MessageListActivity extends AppCompatActivity implements View.OnCli
             try {
                 Message temp = new Message();
                 temp.setBody(message);
-                StegoMessage imageMessage = new StegoMessage(temp, currentUser, MediaStore.Images.Media.getBitmap(this.getContentResolver(), imagePath));
+                StegoMessage imageMessage = new StegoMessage(temp, currentUser,
+                        MediaStore.Images.Media.getBitmap(this.getContentResolver(), imagePath), HelperMethods.NowString());
                 addMessage(imageMessage);
             } catch (IOException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
             }
             cancelImage();
             messageContainer.setText("");

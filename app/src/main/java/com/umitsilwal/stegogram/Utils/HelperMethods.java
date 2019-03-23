@@ -9,9 +9,19 @@ import com.google.common.collect.Iterables;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.Charset;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 
 public class HelperMethods {
+
+
+    public static String NowString(){
+        Date date = new Date();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+        return dateFormat.format(date);
+    }
 
     static byte[] bitmapToByteArray(Bitmap bitmap) {
 
@@ -36,7 +46,6 @@ public class HelperMethods {
     @NonNull
     public static String stringToBinaryStream(String string) {
         byte[] stringInBytes = string.getBytes(Charset.forName("UTF-8"));
-
         return byteArrayToBitsStream(stringInBytes);
     }
 
@@ -55,6 +64,7 @@ public class HelperMethods {
     }
 
     public static byte[] bitsStreamToByteArray(String stream) {
+
         Iterable iterable = Splitter.fixedLength(8).split(stream);
         byte[] resultBytes = new byte[Iterables.size(iterable)];
         Iterator iterator = iterable.iterator();

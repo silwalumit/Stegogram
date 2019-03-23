@@ -22,42 +22,7 @@ public class Steganography {
         int width = stegoImage.getWidth();
         int height = stegoImage.getHeight();
 
-        int key[] = new int[24];
-
-        //Extract Key
-        int keyPixel = stegoImage.getPixel(0, 0);
-
-        int red = Color.red(keyPixel);
-        int green = Color.green(keyPixel);
-        int blue = Color.blue(keyPixel);
-
-        Log.d("EXT", "Key2: " + red + " " + green + " " + blue);
-
-        String red_bin = Integer.toBinaryString(red);
-        red_bin = "00000000" + red_bin;
-        red_bin = red_bin.substring(red_bin.length() - 8);
-
-        for (int i = 0; i <= 7; i++) {
-            key[i] = (red_bin.charAt(i) == '1' ? 1 : 0);
-        }
-
-        String green_bin = Integer.toBinaryString(green);
-        green_bin = "00000000" + green_bin;
-        green_bin = green_bin.substring(green_bin.length() - 8);
-
-        for (int i = 0; i <= 7; i++) {
-            key[i + 8] = (green_bin.charAt(i) == '1' ? 1 : 0);
-        }
-
-        String blue_bin = Integer.toBinaryString(blue);
-        blue_bin = "00000000" + blue_bin;
-        blue_bin = blue_bin.substring(blue_bin.length() - 8);
-
-        for (int i = 0; i <= 7; i++) {
-            key[i + 16] = (blue_bin.charAt(i) == '1' ? 1 : 0);
-        }
-
-        int typePixel = stegoImage.getPixel(0, 1);
+        int typePixel = stegoImage.getPixel(0, 0);
         int tRed = Color.red(typePixel);
         int tGreen = Color.green(typePixel);
         int tBlue = Color.blue(typePixel);
@@ -69,10 +34,10 @@ public class Steganography {
 
         StringBuilder sb = new StringBuilder();
 
-        int keyPos = 0;
+
         outerloop:
         for (int x = 0; x < width; ++x) {
-            for (int y = 2; y < height; ++y) {
+            for (int y = 1; y < height; ++y) {
                 int pixel = stegoImage.getPixel(x, y);
 
                 int colors[] = {Color.red(pixel), Color.green(pixel), Color.blue(pixel)};
@@ -81,14 +46,9 @@ public class Steganography {
                 if (colors[0] == 96 && colors[1] == 62 && colors[2] == 148) {
                     break outerloop;
                 } else {
-
                     for (int c = 0; c < 3; c++) {
-
-                        if ((key[keyPos] ^ LSB2(colors[c])) == 1) {
-                            int lsb = LSB(colors[c]);
-                            sb.append(lsb);
-                            keyPos = (keyPos + 1) % key.length;
-                        }
+                        int lsb = LSB(colors[c]);
+                        sb.append(lsb);
                     }
                 }
             }
@@ -105,69 +65,37 @@ public class Steganography {
 
     public static File EncodeMessage(File input, String secretText) {
         if(secretText.length() <= 0) return input;
+        //convert path into bitmap object
         Bitmap coverImage = BitmapFactory.decodeFile(input.getPath());
+
+        //make a new bitmap based on the dimensions of this bitmap
+        // ARGB_8888 - Each pixel is stored on 4 bytes.
         Bitmap stegoImage = coverImage.copy(Bitmap.Config.ARGB_8888, true);
+
         stegoImage.setPremultiplied(false);
 
+        //convert text into binary stream
         String sTextInBin = HelperMethods.stringToBinaryStream(secretText);
 
         int secretMessageLen = sTextInBin.length();
-        int action, embMesPos = 0, keyPos = 0;
+        int action, embMesPos = 0;
 
         int width = coverImage.getWidth();
         int height = coverImage.getHeight();
 
         //If secret message is too long (3 bits in each pixel + skipping of some pixels)
-        if (secretMessageLen > width * height * 2) {
+        if (secretMessageLen > width * height) {
             return null;
         }
 
-        //Generate and place random 24 bit array of 0-1 in (0,0) pixel
-        int key[] = generateKey();
-        int temp_number;
-
-        int red_sum = 0;
-        for (int j = 0; j <= 7; ++j) {
-            if (key[j] == 1) {
-                temp_number = (int) Math.pow(2, 7 - j);
-            } else {
-                temp_number = 0;
-            }
-            red_sum += temp_number;
-        }
-
-        int green_sum = 0;
-        for (int j = 8; j <= 15; ++j) {
-            if (key[j] == 1) {
-                temp_number = (int) Math.pow(2, 15 - j);
-            } else {
-                temp_number = 0;
-            }
-            green_sum += temp_number;
-        }
-
-        int blue_sum = 0;
-        for (int j = 16; j <= 23; ++j) {
-            if (key[j] == 1) {
-                temp_number = (int) Math.pow(2, 23 - j);
-            } else {
-                temp_number = 0;
-            }
-            blue_sum += temp_number;
-        }
-
-        //Update (0,1) pixel with RGB_888 as for key values
-        stegoImage.setPixel(0, 0, Color.rgb(red_sum, green_sum, blue_sum));
-        Log.d("EMB", "Key1: " + red_sum + " " + green_sum + " " + blue_sum);
-
         //To check if secret message is text. (0,0,COLOR_RGB_TEXT)
-        stegoImage.setPixel(0, 1, Constants.COLOR_RGB_TEXT);
+        stegoImage.setPixel(0, 0, Constants.COLOR_RGB_TEXT);
 
-        int endX = 0, endY = 2;
+        int endX = 0, endY = 1;
 
         outerloop:
         for (int x = 0; x < width; x++) {
-            for (int y = 2; y < height; y++) {
+            for (int y = 1; y < height; y++) {
                 int pixel = coverImage.getPixel(x, y);
 
                 if (embMesPos < secretMessageLen) {
@@ -178,13 +106,9 @@ public class Steganography {
                             break;
                         }
 
-                        //Action for LSB
-                        if ((key[keyPos] ^ LSB2(colors[c])) == 1) {
-                            action = action(colors[c], sTextInBin.charAt(embMesPos));
-                            colors[c] += action;
-                            embMesPos++;
-                            keyPos = (keyPos + 1) % key.length;
-                        }
+                        action = action(colors[c], sTextInBin.charAt(embMesPos));
+                        colors[c] += action;
+                        embMesPos++;
                     }
 
                     int newPixel = Color.rgb(colors[0], colors[1], colors[2]);
@@ -224,9 +148,6 @@ public class Steganography {
         return number & 1;
     }
 
-    private static int LSB2(int number) {
-        return (number >> 1) & 1;
-    }
 
     private static int action(int color, char bit) {
         if (LSB(color) == 1 && bit == '0') {
@@ -236,19 +157,5 @@ public class Steganography {
         } else {
             return 0;
         }
-    }
-
-    private static int[] generateKey() {
-        final int[] bits = {0, 1};
-        int[] result = new int[24];
-
-        int n, i;
-        Random random = new Random();
-
-        for (i = 0; i < result.length; ++i) {
-            n = random.nextInt(2);
-            result[i] = bits[n];
-        }
-        return result;
     }
 }

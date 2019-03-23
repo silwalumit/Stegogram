@@ -22,4 +22,8 @@
     </string>
     <string name="logout_text">Logout</string>
     <string name="show_msg_btn_text">Decode Message</string>
+    <string name="add_contact_btn_label">Add To Contact</string>
+    <string name="add_contact_hint">Enter user\'s jid. eg john@chat.im</string>
+    <string name="add_contact_nickname_hint">Enter user\'s nickname.</string>
+
 </resources>

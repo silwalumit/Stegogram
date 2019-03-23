@@ -8,13 +8,23 @@
     android:padding="5dp">
 
     <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:id="@+id/username_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20dp"
+        android:layout_marginVertical="5dp"
+        android:padding="10dp"
+        android:background="@color/nav_color"/>
 
     <Button
         android:id="@+id/logout_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/button_normal"
+        android:background="@color/nav_color"
+        android:layout_marginVertical="5dp"
         android:onClick="logout"
-        android:text="@string/logout_text" />
+        android:text="@string/logout_text"
+        />
 
 </LinearLayout>

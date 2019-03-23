@@ -3,6 +3,7 @@
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="8dp">
@@ -26,12 +27,13 @@
 
     <TextView
         android:id="@+id/text_message_time"
-        android:text="11:40"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
+        android:text="11:40"
         android:textSize="10sp"
-        android:layout_marginEnd="4dp"
-        app:layout_constraintBottom_toBottomOf="@+id/text_message_body"
-        app:layout_constraintRight_toLeftOf="@+id/text_message_body" />
+        app:layout_constraintEnd_toEndOf="@+id/text_message_body"
+        app:layout_constraintTop_toBottomOf="@+id/text_message_body" />
 
 </android.support.constraint.ConstraintLayout>

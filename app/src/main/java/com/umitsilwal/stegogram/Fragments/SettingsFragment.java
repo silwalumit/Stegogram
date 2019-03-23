@@ -2,10 +2,12 @@ package com.umitsilwal.stegogram.Fragments;
 
 
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.umitsilwal.stegogram.R;
 
@@ -26,7 +28,10 @@ public class SettingsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        return inflater.inflate(R.layout.fragment_settings, container, false);
+        View view = inflater.inflate(R.layout.fragment_settings, container, false);
+        TextView username = view.findViewById(R.id.username_textview);
+        username.setText(PreferenceManager.getDefaultSharedPreferences(getContext()).getString("xmpp_username", null));
+        return view;
     }
 
 

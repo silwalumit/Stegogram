@@ -118,7 +118,7 @@ public class MessageListAdapter extends RecyclerView.Adapter{
         void bind(StegoMessage message) {
             messageText.setText(message.getBody());
             // Format the stored timestamp into a readable String using method.
-            timeText.setText("10:11");
+            timeText.setText(message.getDate());
             profileImage.setText(message.getSenderJID().substring(0,1).toUpperCase());
         }
 
@@ -166,7 +166,7 @@ public class MessageListAdapter extends RecyclerView.Adapter{
         void bind(StegoMessage message) {
             messageText.setText(message.getBody());
             // Format the stored timestamp into a readable String using method.
-            timeText.setText("10:11");
+            timeText.setText(message.getDate());
         }
     }
 

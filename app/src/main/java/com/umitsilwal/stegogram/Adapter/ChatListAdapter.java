@@ -1,6 +1,7 @@
 package com.umitsilwal.stegogram.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
@@ -10,7 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.umitsilwal.stegogram.Activity.MessageListActivity;
 import com.umitsilwal.stegogram.ChatListData;
+import com.umitsilwal.stegogram.ContactData;
 import com.umitsilwal.stegogram.R;
 
 import java.util.LinkedList;
@@ -35,10 +38,10 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatLi
 
     @Override
     public void onBindViewHolder(@NonNull ChatListHolder holder, int position) {
-        holder.mSender.setText(chatListData.get(position).getmSender());
-        holder.mContactDetail.setText(chatListData.get(position).getmDetails());
-        holder.mContactTime.setText(chatListData.get(position).getmTime());
-        holder.mIcon.setText(chatListData.get(position).getmSender().substring(0, 1));
+        holder.mSender.setText(chatListData.get(position).getSender());
+        holder.mContactDetail.setText(chatListData.get(position).getDetails());
+        holder.mContactTime.setText(chatListData.get(position).getTime());
+        holder.mIcon.setText(chatListData.get(position).getSender().substring(0, 1));
         Random mRandom = new Random();
         int color = Color.argb(255, mRandom.nextInt(256), mRandom.nextInt(256), mRandom.nextInt(256));
         ((GradientDrawable) holder.mIcon.getBackground()).setColor(color);
@@ -70,10 +73,12 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatLi
         @Override
         public void onClick(View v) {
             int pos = getLayoutPosition();
-//            Intent intent = new Intent(context, MessageListActivity.class);
-//            ChatListData chatInfo = chatListData.get(pos);
-//            intent.putExtra(ContactListAdapter.ContactListHolder.EXTRA_TITLE, chatInfo.getmSender());
-//            context.startActivity(intent);
+
+            Intent intent = new Intent(context, MessageListActivity.class);
+            ChatListData chatInfo = chatListData.get(pos);
+            ContactData contact = new ContactData(chatInfo.getSender(), chatInfo.getSender().split("@")[0]);
+            intent.putExtra(ContactListAdapter.ContactListHolder.RECEIVER, contact);
+            context.startActivity(intent);
         }
     }
 }

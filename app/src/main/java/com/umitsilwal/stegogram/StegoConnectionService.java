@@ -7,16 +7,20 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.umitsilwal.stegogram.Database.DBHelper;
+
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
+import org.jxmpp.jid.impl.JidCreate;
+import org.jxmpp.stringprep.XmppStringprepException;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -30,6 +34,8 @@ public class StegoConnectionService extends Service {
     public static final String ACTION_ROSTER_LOADED = BuildConfig.APPLICATION_ID + ".ACTION_ROSTER_LOADED";
     public static final String ACTION_MESSAGE_RECEIVED = BuildConfig.APPLICATION_ID + ".ACTION_MESSAGE_RECEIVED";
     public static final String ACTION_IMAGE_RECEIVED =  BuildConfig.APPLICATION_ID + ".ACTION_IMAGE_RECEIVED";
+    public static final String ACTION_CONTACT_ADDED = BuildConfig.APPLICATION_ID + ".ACTION_CONTACT_ADDED";
+    public static final String ACTION_CONTACT_ADD_FAILED = BuildConfig.APPLICATION_ID + ".ACTION_CONTACT_ADD_FAILED";
 
     public static final String ACTION_SEND_MESSAGE = BuildConfig.APPLICATION_ID + ".ACTION_SEND_MESSAGE";
     public static final String ACTION_SEND_IMAGE = BuildConfig.APPLICATION_ID + ".ACTION_SEND_IMAGE";
@@ -37,6 +43,10 @@ public class StegoConnectionService extends Service {
     public static final String ACTION_LOGOUT = BuildConfig.APPLICATION_ID + ".ACTION_LOGOUT";
     public static final String ACTION_LOGIN = BuildConfig.APPLICATION_ID + ".ACTION_LOGIN";
     public static final String ACTION_CONNECT = BuildConfig.APPLICATION_ID + ".ACTION_CONNECT";
+    public static final String ACTION_ADD_CONTACT = BuildConfig.APPLICATION_ID + ".ACTION_ADD_CONTACT";
+
+    public static final String ACTION_RELOAD_ROSTER = BuildConfig.APPLICATION_ID + ".ACTION_RELOAD_ROSTER";
+
 
     public static StegoConnection.CONNECTION_STATE sConnectionState;
     public static StegoConnection.LOGIN_STATUS sLogInStatus;
@@ -71,7 +81,7 @@ public class StegoConnectionService extends Service {
 
     private void initConnection()
     {
-        Log.d(TAG, "Initializing Connection.");
+        //Log.d(TAG, "Initializing Connection.");
         if( mConnection == null)
         {
             mConnection = new StegoConnection(this);
@@ -83,8 +93,8 @@ public class StegoConnectionService extends Service {
             Intent i1 = new Intent(ACTION_NO_CONN);
             i1.setPackage(getPackageName());
             LocalBroadcastManager.getInstance(this).sendBroadcast(i1);
-            Log.d(TAG,"Something went wrong while connecting!");
-            e.printStackTrace();
+            //Log.d(TAG,"Something went wrong while connecting!");
+            //e.printStackTrace();
             //stop the service all together
             stopSelf();
         }
@@ -92,7 +102,7 @@ public class StegoConnectionService extends Service {
 
     private void start()
     {
-        Log.d(TAG, "Starting Service");
+        //Log.d(TAG, "Starting Service");
         if(!mActive)
         {
             mActive = true;
@@ -118,7 +128,7 @@ public class StegoConnectionService extends Service {
 
     private void authenticate()
     {
-        Log.d(TAG, "Authenticating");
+        //Log.d(TAG, "Authenticating");
         if(mActive)
         {
             if(mConnection != null){
@@ -130,8 +140,8 @@ public class StegoConnectionService extends Service {
                     i1.setPackage(getPackageName());
                     LocalBroadcastManager.getInstance(this).sendBroadcast(i1);
 
-                    Log.d(TAG,"Could not login.");
-                    e.printStackTrace();
+                    //Log.d(TAG,"Could not login.");
+                    //e.printStackTrace();
                     stopSelf();
                 }
             }
@@ -142,7 +152,7 @@ public class StegoConnectionService extends Service {
 
     private void stop()
     {
-        Log.d(TAG, "Stopping Service");
+        //Log.d(TAG, "Stopping Service");
         mActive = false;
         if(mTHandler != null) {
             mTHandler.post(new Runnable() {
@@ -167,7 +177,7 @@ public class StegoConnectionService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         try {
            String action = intent.getAction();
-            Log.d(TAG, "Starting Service");
+            //Log.d(TAG, "Starting Service");
             switch (action) {
                 case ACTION_LOGIN:
                     authenticate();
@@ -187,6 +197,10 @@ public class StegoConnectionService extends Service {
                             Uri.parse(intent.getStringExtra("filePath")),
                             intent.getStringExtra("message_body"));
                     break;
+                case ACTION_ADD_CONTACT:
+                    addContact(intent.getStringExtra("user_jid"),
+                                intent.getStringExtra("user_nickname"));
+                    break;
                 default:
                     start();
             }
@@ -194,6 +208,17 @@ public class StegoConnectionService extends Service {
             start();
         }
         return Service.START_STICKY;
+    }
+
+    private void addContact(String userJid, String userNickname) {
+        try {
+            mConnection.addRosterEntry(userJid, userNickname);
+        } catch (XmppStringprepException | SmackException.NotConnectedException | InterruptedException | SmackException.NotLoggedInException | XMPPException.XMPPErrorException | SmackException.NoResponseException e) {
+            //e.printStackTrace();
+            Intent i1 = new Intent(ACTION_CONTACT_ADD_FAILED);
+            i1.setPackage(getPackageName());
+            LocalBroadcastManager.getInstance(this).sendBroadcast(i1);
+        }
     }
 
     private void sendImage(String jid, Uri imagePath, String messageToEncode){
@@ -221,26 +246,33 @@ public class StegoConnectionService extends Service {
             if(messageToEncode.length() > 0) {
                 image = Steganography.EncodeMessage(image, messageToEncode);
             }
+
+            DBHelper messagesDB = new DBHelper(getApplicationContext());
+            messagesDB.AddMessage(PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+                            .getString("xmpp_username", null),
+                    JidCreate.bareFrom(jid).asUnescapedString(),
+                    messageToEncode, image.getPath());
+
             mConnection.sendImage(jid, image);
         } catch(IOException e){
-            e.printStackTrace();
-            Log.d(TAG, "Cannot read image.");
+            //e.printStackTrace();
+            //Log.d(TAG, "Cannot read image.");
         }
     }
 
     private void sendMessage(String body, String jid) {
-        Log.d(TAG, "Sending Message");
+        //Log.d(TAG, "Sending Message");
         mConnection.sendMessage(body, jid);
     }
 
     private void getRoster() {
-        Log.d(TAG, "Getting Roster");
+        //Log.d(TAG, "Getting Roster");
         mConnection.loadRoster();
     }
 
     @Override
     public void onDestroy() {
-        Log.d(TAG, "Destroying Service.");
+        //Log.d(TAG, "Destroying Service.");
         super.onDestroy();
         stop();
     }
